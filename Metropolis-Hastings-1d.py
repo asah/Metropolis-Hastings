@@ -1,3 +1,6 @@
+#
+# Metropolis-Hastings algorithm, for study purposes (1-dimensional version)
+#
 import numpy as np
 import matplotlib.pyplot as pl
 
@@ -22,9 +25,11 @@ samples[0] = 0.2  # TODO(asah): WTF is this and why is it important?
 # mathematician...
 num_accepted = 0
 
-# 
+# gather samples
 for i in range(num_samples-1):
+    # TODO: why use a normal distribution of random numbers?
     samples_next = np.random.normal(samples[i], 1.)
+    # TODO: what is this magic?! what's the intuition?!
     if np.random.random_sample() < min(1, f(samples_next) / f(samples[i])):
         samples[i+1] = samples_next
         num_accepted = num_accepted + 1
