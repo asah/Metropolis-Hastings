@@ -2,23 +2,38 @@ import numpy as np
 import matplotlib.pyplot as pl
 
 def f(x):
-    return x
+    """
+    define some function - could be anything, so let's pick something simple.
 
-def main():
-    N = 100000
-    x = np.arange(N,dtype=np.float)
+    intuition: given a location, what is the value at that location,
+    e.g. for a restaurant, how busy is it by time of day?
+    """
+    return np.exp(-x**2)
 
-    x[0] = 0.2
-    for i in range(0, N-1):
-        
-        x_next = np.random.random_sample()
-        if np.random.random_sample() < min(1, f(x_next)/f(x[i])):
-            x[i+1] = x_next
-        else:
-            x[i+1] = x[i]
+# how many samples to take... I read that you need >>1000 to amortize
+# startup searching, which seems suspicious and inefficient to me...
+num_samples = 100_000
+    
+samples = np.arange(num_samples, dtype=np.float)
+samples[0] = 0.2  # TODO(asah): WTF is this and why is it important?
 
-    pl.hist(x, bins=50, color='blue')
-    pl.show()
+# apparently, M-H has a concept of "accepting" a sample
+# TODO: feels wasteful to me vs accepting everything... but I'm not a
+# mathematician...
+num_accepted = 0
 
-if __name__ == '__main__':
-    main()
+# 
+for i in range(num_samples-1):
+    samples_next = np.random.normal(samples[i], 1.)
+    if np.random.random_sample() < min(1, f(samples_next) / f(samples[i])):
+        samples[i+1] = samples_next
+        num_accepted = num_accepted + 1
+    else:
+        samples[i+1] = samples[i]
+print(f"acceptance rate is {num_accepted / float(num_samples) * 100.0:.1f}%")
+
+#
+# create and display a histogram
+#
+pl.hist(samples, bins=50, color='blue')
+pl.show()
